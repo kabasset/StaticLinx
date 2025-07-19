@@ -16,99 +16,118 @@
 namespace Linx {
 
 template <typename T>
-struct VectorContainerAdaptor;
+class VectorBase;
 
 template <typename T>
-struct VectorContainerAdaptor<T*> {
+class VectorBase<T*> {
+public:
+
   static constexpr int n = -1;
   using value_type = T;
   using Container = std::vector<T>;
-  Container m_container;
-  VectorContainerAdaptor(auto begin, auto end) : m_container(begin, end) {}
-  auto size() const
+
+  constexpr VectorBase(auto begin, auto end) : m_container(begin, end) {}
+
+  constexpr auto size() const
   {
     return m_container.size();
   }
-  const value_type& operator[](std::integral auto i) const
+
+  constexpr const value_type& operator[](std::integral auto i) const
   {
     return m_container[i];
   }
+
+private:
+
+  Container m_container;
 };
 
 template <typename T, int N>
-struct VectorContainerAdaptor<T[N]> {
+class VectorBase<T[N]> {
+public:
+
   static constexpr int n = N;
   using value_type = T;
   using Container = std::array<T, N>;
   Container m_container;
-  VectorContainerAdaptor(auto begin, auto end) : m_container {}
+
+  constexpr VectorBase(auto begin, auto end) : m_container {}
   {
     std::copy(begin, end, m_container.data());
   }
-  auto size() const
+
+  constexpr auto size() const
   {
     return n;
   }
-  const value_type& operator[](std::integral auto i) const
+
+  constexpr const value_type& operator[](std::integral auto i) const
   {
     return m_container[i];
   }
 };
 
 template <typename T, auto... Coefs>
-struct VectorContainerAdaptor<std::integer_sequence<T, Coefs...>> {
+class VectorBase<std::integer_sequence<T, Coefs...>> {
+public:
+
   static constexpr int n = sizeof...(Coefs);
   using value_type = const T;
   using Container = void;
-  VectorContainerAdaptor(auto&&...) {}
-  static constexpr auto size()
+
+  constexpr VectorBase(auto&&...) {}
+  constexpr static auto size()
   {
     return n;
   }
-  value_type operator[](std::integral auto i) const
+
+  constexpr value_type operator[](std::integral auto i) const
   {
-    return get<Coefs...>(i);
+    return at<Coefs...>(i);
   }
 
+private:
+
   template <auto I0 = 0, auto... Is>
-  static constexpr value_type get(std::integral auto i)
+  static constexpr value_type at(std::integral auto i)
   {
-    return i == 0 ? I0 : get<Is...>(i - 1);
+    return i == 0 ? I0 : at<Is...>(i - 1);
   }
 };
 
 template <>
-struct VectorContainerAdaptor<void> {
+class VectorBase<void> {
+public:
+
   static constexpr int n = 0;
   using value_type = const int;
   using Container = void;
-  VectorContainerAdaptor(auto&&...) {}
-  int size() const
+
+  constexpr VectorBase(auto&&...) {}
+
+  static constexpr int size()
   {
     return 0;
   }
+
   constexpr int operator[](auto&&) const
+  {
+    return at(0);
+  }
+
+  static constexpr int at(auto&&)
   {
     return 0;
   }
 };
 
 template <typename T = void>
-struct Vector {
-  static constexpr auto n = VectorContainerAdaptor<T>::n;
-  using value_type = typename VectorContainerAdaptor<T>::value_type;
-  Vector() : m_container {} {}
-  Vector(auto begin, auto end) : m_container(begin, end) {}
-  auto size() const
-  {
-    return m_container.size();
-  }
-  decltype(auto) operator[](std::integral auto i) const
-  {
-    return m_container[i];
-  }
+class Vector : public VectorBase<T> {
+public:
 
-  VectorContainerAdaptor<T> m_container;
+  constexpr Vector() : VectorBase<T> {} {}
+  constexpr Vector(auto begin, auto end) : VectorBase<T>(begin, end) {}
 };
 
 template <typename T>
@@ -126,51 +145,63 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& p)
 }
 
 template <typename T>
-auto vec(std::initializer_list<T> coefs)
+constexpr auto vec(std::initializer_list<T> coefs)
 {
   return Vector<T*>(coefs.begin(), coefs.end());
 }
 
 template <typename T, int N>
-auto vec(T (&&coefs)[N])
+constexpr auto vec(T (&&coefs)[N])
 {
   return Vector<T[N]>(coefs, coefs + std::size(coefs));
 }
 
 template <typename T, std::size_t N>
-auto vec(const std::array<T, N>& coefs)
+constexpr auto vec(const std::array<T, N>& coefs)
 {
   return Vector<T[N]>(std::begin(coefs), std::end(coefs));
 }
 
 template <std::integral T0, std::integral... Ts>
-auto vec(T0 coef0, Ts... coefs)
+constexpr auto vec(T0 coef0, Ts... coefs)
 {
   return vec(std::array {coef0, T0 {coefs}...});
 }
 
 template <std::integral auto Coef0, std::integral auto... Coefs>
-auto vec()
+static constexpr auto vec()
 {
   using T = decltype(Coef0);
   return Vector<std::integer_sequence<T, Coef0, Coefs...>>();
 }
 
+template <typename T, auto... Is>
+constexpr auto vec_impl(auto coef, std::integer_sequence<T, Is...>)
+{
+  return vec((Is, coef)...);
+}
+
+template <std::integral auto Coef, typename T, auto... Is>
+static constexpr auto vec_impl(std::integer_sequence<T, Is...>)
+{
+  return vec<(Is, Coef)...>();
+}
+
+template <Rank R>
+constexpr auto vec(auto coef)
+{
+  using T = decltype(coef);
+  return vec_impl(coef, std::make_integer_sequence<T, R.n>());
+}
+
 template <Rank R, std::integral auto Coef = 0>
-auto vec()
+static constexpr auto vec()
 {
   using T = decltype(Coef);
   return vec_impl<Coef>(std::make_integer_sequence<T, R.n>());
 }
 
-template <std::integral auto Coef, typename T, auto... Is>
-auto vec_impl(std::integer_sequence<T, Is...>)
-{
-  return vec<(Is, Coef)...>();
-}
-
-template <typename T = int>
-auto vec_0()
+static constexpr auto vec()
 {
   return Vector<>();
 }

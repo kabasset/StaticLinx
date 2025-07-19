@@ -25,7 +25,6 @@ struct Mask {
   template <int Norm = 2>
   Mask& ball(double radius)
   {
-    std::cout << radius << " ";
     return *this;
   }
 

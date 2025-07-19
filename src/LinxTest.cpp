@@ -22,19 +22,19 @@ int main()
 
   std::cout << std::endl;
 
-  std::cout << "Box(vec) " << Linx::Box(Linx::vec(1, 2, 3)) << std::endl;
+  std::cout << "   Box() " << Linx::Box(Linx::vec(1, 2, 3)) << std::endl;
   std::cout << " shape() " << Linx::shape(1, 2, 3) << std::endl;
   std::cout << " shape<> " << Linx::shape<1, 2, 3>() << std::endl;
 
   std::cout << std::endl;
 
-  std::cout << " Box(, ) " << Linx::Box(Linx::vec(-1, -2, -3), Linx::vec(2, 3, 4)) << std::endl;
+  std::cout << "  Box(,) " << Linx::Box(Linx::vec(-1, -2, -3), Linx::vec(2, 3, 4)) << std::endl;
   std::cout << "radius() " << Linx::radius(1, 2, 3) << std::endl;
   std::cout << "radius<> " << Linx::radius<1, 2, 3>() << std::endl;
 
   std::cout << std::endl;
 
   std::cout << "   Image " << Linx::default_initialized<int>(Linx::shape(1, 2, 3)) << std::endl;
-  std::cout << "  ball<> " << Linx::ball<3, 2_D, 1>() << std::endl;
-  std::cout << "  ball() " << Linx::ball<1>(Linx::vec<2_D, 3>()) << std::endl;
+  std::cout << "ball<-1> " << Linx::ball<-1>(Linx::vec<2_D, 3>()) << std::endl;
+  std::cout << " ball<1> " << Linx::ball<1>(Linx::vec<2_D>(3)) << std::endl;
 }

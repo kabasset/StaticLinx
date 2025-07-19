@@ -51,6 +51,7 @@ auto radius(auto... args)
 {
   return Box(vec(-args...), vec((args + 1)...));
 }
+
 template <auto... Args>
 auto radius()
 {

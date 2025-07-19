@@ -55,9 +55,9 @@ struct VectorContainerAdaptor<T[N]> {
   }
 };
 
-template <typename T, auto... Is>
-struct VectorContainerAdaptor<std::integer_sequence<T, Is...>> {
-  static constexpr int n = sizeof...(Is);
+template <typename T, auto... Coefs>
+struct VectorContainerAdaptor<std::integer_sequence<T, Coefs...>> {
+  static constexpr int n = sizeof...(Coefs);
   using value_type = const T;
   using Container = void;
   VectorContainerAdaptor(auto&&...) {}
@@ -67,13 +67,13 @@ struct VectorContainerAdaptor<std::integer_sequence<T, Is...>> {
   }
   value_type operator[](std::integral auto i) const
   {
-    return get<Is...>(i);
+    return get<Coefs...>(i);
   }
 
-  template <auto J0 = 0, auto... Js>
+  template <auto I0 = 0, auto... Is>
   static constexpr value_type get(std::integral auto i)
   {
-    return i == 0 ? J0 : get<Js...>(i - 1);
+    return i == 0 ? I0 : get<Is...>(i - 1);
   }
 };
 
@@ -144,29 +144,29 @@ auto vec(const std::array<T, N>& coefs)
 }
 
 template <std::integral T0, std::integral... Ts>
-auto vec(T0 i0, Ts... is)
+auto vec(T0 coef0, Ts... coefs)
 {
-  return vec(std::array {i0, T0 {is}...});
+  return vec(std::array {coef0, T0 {coefs}...});
 }
 
-template <std::integral auto I0, std::integral auto... Is>
+template <std::integral auto Coef0, std::integral auto... Coefs>
 auto vec()
 {
-  using T = decltype(I0);
-  return Vector<std::integer_sequence<T, I0, Is...>>();
+  using T = decltype(Coef0);
+  return Vector<std::integer_sequence<T, Coef0, Coefs...>>();
 }
 
-template <Rank R, std::integral auto I = 0>
+template <Rank R, std::integral auto Coef = 0>
 auto vec()
 {
-  using T = decltype(I);
-  return vec_impl<I>(std::make_integer_sequence<T, R.n>());
+  using T = decltype(Coef);
+  return vec_impl<Coef>(std::make_integer_sequence<T, R.n>());
 }
 
-template <std::integral auto I, typename T, auto... Is>
+template <std::integral auto Coef, typename T, auto... Is>
 auto vec_impl(std::integer_sequence<T, Is...>)
 {
-  return vec<(I + Is * 0)...>();
+  return vec<(Is, Coef)...>();
 }
 
 template <typename T = int>

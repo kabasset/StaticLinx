@@ -7,6 +7,7 @@
 
 #include "Linx/Data/Box.h"
 #include "Linx/Data/Rank.h"
+#include "Linx/Data/Vector.h"
 
 #include <limits>
 
@@ -46,16 +47,16 @@ std::ostream& operator<<(std::ostream& os, const Mask<TDomain>& b)
   return os << b.m_domain;
 }
 
-template <int Norm = 2, typename TDomain>
-auto ball(TDomain domain)
-{
-  return Mask(domain).template ball<Norm>();
-}
-
 template <int Radius, Rank R, int Norm = 2>
 constexpr auto ball()
 {
-  return Mask(Box(at<Radius, R>())).template ball<Norm>(); // FIXME
+  return Mask(Box(vec<R, Radius>())).template ball<Norm>(); // FIXME
+}
+
+template <int Norm = 2>
+constexpr auto ball(auto radius)
+{
+  return Mask(Box(radius)).template ball<Norm>();
 }
 
 } // namespace Linx

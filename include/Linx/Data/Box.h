@@ -5,14 +5,14 @@
 #ifndef LINX_DATA_BOX_H
 #define LINX_DATA_BOX_H
 
-#include "Linx/Data/Position.h"
+#include "Linx/Data/Vector.h"
 
 namespace Linx {
 
 template <typename TStart = void, typename TStop = void>
 struct Box {
-  using Start = Position<TStart>;
-  using Stop = Position<TStop>;
+  using Start = Vector<TStart>;
+  using Stop = Vector<TStop>;
   Box(const Stop& stop) : m_start {}, m_stop(stop) {}
   Box(const Start& start, const Stop& stop) : m_start(start), m_stop(stop) {}
   auto rank() const
@@ -39,22 +39,22 @@ std::ostream& operator<<(std::ostream& os, const Box<TStart, TStop>& b)
 
 auto shape(auto... args)
 {
-  return Box(at(args...));
+  return Box(vec(args...));
 }
 template <auto... Args>
 auto shape()
 {
-  return Box(at<Args...>());
+  return Box(vec<Args...>());
 }
 
 auto radius(auto... args)
 {
-  return Box(at(-args...), at((args + 1)...));
+  return Box(vec(-args...), vec((args + 1)...));
 }
 template <auto... Args>
 auto radius()
 {
-  return Box(at<-Args...>(), at<(Args + 1)...>());
+  return Box(vec<-Args...>(), vec<(Args + 1)...>());
 }
 
 } // namespace Linx

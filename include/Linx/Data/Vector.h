@@ -2,8 +2,8 @@
 // SPDX-PackageSourceInfo: https://github.com/kabasset/Linx
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef LINX_DATA_POSITION_H
-#define LINX_DATA_POSITION_H
+#ifndef LINX_DATA_VECTOR_H
+#define LINX_DATA_VECTOR_H
 
 #include "Linx/Data/Rank.h"
 
@@ -16,15 +16,15 @@
 namespace Linx {
 
 template <typename T>
-struct PositionContainerAdaptor;
+struct VectorContainerAdaptor;
 
 template <typename T>
-struct PositionContainerAdaptor<T*> {
+struct VectorContainerAdaptor<T*> {
   static constexpr int n = -1;
   using value_type = T;
   using Container = std::vector<T>;
   Container m_container;
-  PositionContainerAdaptor(auto begin, auto end) : m_container(begin, end) {}
+  VectorContainerAdaptor(auto begin, auto end) : m_container(begin, end) {}
   auto size() const
   {
     return m_container.size();
@@ -36,12 +36,12 @@ struct PositionContainerAdaptor<T*> {
 };
 
 template <typename T, int N>
-struct PositionContainerAdaptor<T[N]> {
+struct VectorContainerAdaptor<T[N]> {
   static constexpr int n = N;
   using value_type = T;
   using Container = std::array<T, N>;
   Container m_container;
-  PositionContainerAdaptor(auto begin, auto end) : m_container {}
+  VectorContainerAdaptor(auto begin, auto end) : m_container {}
   {
     std::copy(begin, end, m_container.data());
   }
@@ -56,11 +56,11 @@ struct PositionContainerAdaptor<T[N]> {
 };
 
 template <typename T, auto... Is>
-struct PositionContainerAdaptor<std::integer_sequence<T, Is...>> {
+struct VectorContainerAdaptor<std::integer_sequence<T, Is...>> {
   static constexpr int n = sizeof...(Is);
   using value_type = const T;
   using Container = void;
-  PositionContainerAdaptor(auto&&...) {}
+  VectorContainerAdaptor(auto&&...) {}
   static constexpr auto size()
   {
     return n;
@@ -78,11 +78,11 @@ struct PositionContainerAdaptor<std::integer_sequence<T, Is...>> {
 };
 
 template <>
-struct PositionContainerAdaptor<void> {
+struct VectorContainerAdaptor<void> {
   static constexpr int n = 0;
   using value_type = const int;
   using Container = void;
-  PositionContainerAdaptor(auto&&...) {}
+  VectorContainerAdaptor(auto&&...) {}
   int size() const
   {
     return 0;
@@ -94,11 +94,11 @@ struct PositionContainerAdaptor<void> {
 };
 
 template <typename T = void>
-struct Position {
-  static constexpr auto n = PositionContainerAdaptor<T>::n;
-  using value_type = typename PositionContainerAdaptor<T>::value_type;
-  Position() : m_container {} {}
-  Position(auto begin, auto end) : m_container(begin, end) {}
+struct Vector {
+  static constexpr auto n = VectorContainerAdaptor<T>::n;
+  using value_type = typename VectorContainerAdaptor<T>::value_type;
+  Vector() : m_container {} {}
+  Vector(auto begin, auto end) : m_container(begin, end) {}
   auto size() const
   {
     return m_container.size();
@@ -108,11 +108,11 @@ struct Position {
     return m_container[i];
   }
 
-  PositionContainerAdaptor<T> m_container;
+  VectorContainerAdaptor<T> m_container;
 };
 
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const Position<T>& p)
+std::ostream& operator<<(std::ostream& os, const Vector<T>& p)
 {
   if (p.size() == 0) {
     return os << "O";
@@ -126,58 +126,53 @@ std::ostream& operator<<(std::ostream& os, const Position<T>& p)
 }
 
 template <typename T>
-auto at(std::initializer_list<T> position)
+auto vec(std::initializer_list<T> coefs)
 {
-  return Position<T*>(position.begin(), position.end());
+  return Vector<T*>(coefs.begin(), coefs.end());
 }
 
 template <typename T, int N>
-auto at(T (&&position)[N])
+auto vec(T (&&coefs)[N])
 {
-  return Position<T[N]>(position, position + std::size(position));
+  return Vector<T[N]>(coefs, coefs + std::size(coefs));
 }
 
 template <typename T, std::size_t N>
-auto at(const std::array<T, N>& position)
+auto vec(const std::array<T, N>& coefs)
 {
-  return Position<T[N]>(std::begin(position), std::end(position));
+  return Vector<T[N]>(std::begin(coefs), std::end(coefs));
 }
 
 template <std::integral T0, std::integral... Ts>
-auto at(T0 i0, Ts... is)
+auto vec(T0 i0, Ts... is)
 {
-  return at(std::array {i0, T0 {is}...});
+  return vec(std::array {i0, T0 {is}...});
 }
 
 template <std::integral auto I0, std::integral auto... Is>
-auto at()
+auto vec()
 {
   using T = decltype(I0);
-  return Position<std::integer_sequence<T, I0, Is...>>();
+  return Vector<std::integer_sequence<T, I0, Is...>>();
 }
 
-template <std::integral auto I, Rank R>
-auto at()
+template <Rank R, std::integral auto I = 0>
+auto vec()
 {
   using T = decltype(I);
-  return at_impl<I>(std::make_integer_sequence<T, R.n>());
+  return vec_impl<I>(std::make_integer_sequence<T, R.n>());
 }
 
 template <std::integral auto I, typename T, auto... Is>
-auto at_impl(std::integer_sequence<T, Is...>)
+auto vec_impl(std::integer_sequence<T, Is...>)
 {
-  return at<(I + Is * 0)...>();
-}
-
-consteval auto as_consteval(auto in)
-{
-  return in;
+  return vec<(I + Is * 0)...>();
 }
 
 template <typename T = int>
-auto origin()
+auto vec_0()
 {
-  return Position<>();
+  return Vector<>();
 }
 
 } // namespace Linx

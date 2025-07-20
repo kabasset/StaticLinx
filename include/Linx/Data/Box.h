@@ -47,15 +47,10 @@ auto shape()
   return Box(vec<Args...>());
 }
 
-auto radius(auto... args)
+auto cube(auto radius)
 {
-  return Box(vec(-args...), vec((args + 1)...));
-}
-
-template <auto... Args>
-auto radius()
-{
-  return Box(vec<-Args...>(), vec<(Args + 1)...>());
+  // return Box(vec(-args...), vec((args + 1)...));
+  return Box(radius); // FIXME -radius, radius + 1
 }
 
 } // namespace Linx

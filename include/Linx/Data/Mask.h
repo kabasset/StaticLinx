@@ -29,11 +29,11 @@ std::ostream& operator<<(std::ostream& os, const Mask<TDomain>& b)
 template <int Norm = 2>
 constexpr auto ball(auto radius)
 {
-  auto box = Box(radius); // FIXME -radius, radius + 1
+  auto box = cube(radius);
   if constexpr (Norm == -1) {
     return box;
   } else {
-    return Mask(Box(radius)); // FIXME draw box
+    return Mask(box); // FIXME draw ball
   }
 }
 

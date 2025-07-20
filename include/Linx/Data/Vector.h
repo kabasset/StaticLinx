@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (C) 2025, Antoine Basset
+// SPDX-FileCopyrightText: Copyright (C) 2022-2025, Antoine Basset
 // SPDX-PackageSourceInfo: https://github.com/kabasset/Linx
 // SPDX-License-Identifier: Apache-2.0
 
@@ -50,7 +50,6 @@ public:
   static constexpr int n = N;
   using value_type = T;
   using Container = std::array<T, N>;
-  Container m_container;
 
   constexpr VectorBase(auto begin, auto end) : m_container {}
   {
@@ -66,6 +65,10 @@ public:
   {
     return m_container[i];
   }
+
+private:
+
+  Container m_container;
 };
 
 template <typename T, auto... Coefs>
@@ -77,6 +80,7 @@ public:
   using Container = void;
 
   constexpr VectorBase(auto&&...) {}
+
   constexpr static auto size()
   {
     return n;
@@ -127,6 +131,7 @@ class Vector : public VectorBase<T> {
 public:
 
   constexpr Vector() : VectorBase<T> {} {}
+
   constexpr Vector(auto begin, auto end) : VectorBase<T>(begin, end) {}
 };
 

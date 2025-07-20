@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (C) 2025, Antoine Basset
+// SPDX-FileCopyrightText: Copyright (C) 2022-2025, Antoine Basset
 // SPDX-PackageSourceInfo: https://github.com/kabasset/Linx
 // SPDX-License-Identifier: Apache-2.0
 

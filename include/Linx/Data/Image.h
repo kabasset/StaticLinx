@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: Copyright (C) 2025, Antoine Basset
+// SPDX-FileCopyrightText: Copyright (C) 2022-2025, Antoine Basset
 // SPDX-PackageSourceInfo: https://github.com/kabasset/Linx
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,19 +10,23 @@
 namespace Linx {
 
 template <typename T, typename TDomain>
-struct Image {
+class Image {
+public:
+
   using value_type = T;
   using Domain = TDomain;
+
   Image(Domain domain) : m_domain(domain) {}
+
+  friend std::ostream& operator<<(std::ostream& os, const Image& b)
+  {
+    return os << b.m_domain;
+  }
+
+private:
 
   Domain m_domain;
 };
-
-template <typename T, typename TDomain>
-std::ostream& operator<<(std::ostream& os, const Image<T, TDomain>& b)
-{
-  return os << b.m_domain;
-}
 
 template <typename T, typename TDomain>
 auto default_initialized(TDomain domain)

@@ -17,17 +17,11 @@ struct Rank {
 inline namespace Literals {
 
 template <char... Cs>
+  requires((Cs >= '0' && Cs <= '9') && ...)
 constexpr int parse_int_literal()
 {
   int out = 0;
-  std::array chars {Cs...};
-  for (auto c : chars) {
-    if (c < '0' || c > '9') {
-      return -1;
-    }
-    out = out * 10 + (c - '0');
-  }
-  return out;
+  return ((out = out * 10 + (Cs - '0')), ...);
 }
 
 template <char... Cs>

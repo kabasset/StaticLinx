@@ -56,6 +56,12 @@ private:
   Stop m_stop;
 };
 
+template <typename T, int N>
+Box(T (&&)[N]) -> Box<void, T[N]>;
+
+template <typename T0, int N0, typename T1, int N1>
+Box(T0 (&&)[N0], T1 (&&)[N1]) -> Box<T0[N0], T1[N1]>;
+
 template <auto... Args>
 constexpr auto shape(auto... args)
 {

@@ -53,6 +53,8 @@ public:
   using value_type = T;
   using Container = std::array<T, N>;
 
+  constexpr VectorBase(std::initializer_list<T> coefs) : VectorBase(coefs.begin(), coefs.end()) {}
+
   constexpr VectorBase(auto begin, auto end) : m_container {}
   {
     std::copy(begin, end, m_container.data());

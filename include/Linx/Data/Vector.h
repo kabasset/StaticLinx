@@ -26,6 +26,8 @@ public:
   using value_type = T;
   using Container = std::vector<T>;
 
+  constexpr VectorBase(std::initializer_list<T> coefs) : VectorBase(coefs.begin(), coefs.end()) {}
+
   constexpr VectorBase(auto begin, auto end) : m_container(begin, end) {}
 
   constexpr auto size() const
@@ -130,9 +132,14 @@ template <typename T = void>
 class Vector : public VectorBase<T> {
 public:
 
-  constexpr Vector() : VectorBase<T> {} {}
+  using reference = const VectorBase<T>::value_type&;
 
-  constexpr Vector(auto begin, auto end) : VectorBase<T>(begin, end) {}
+  using VectorBase<T>::VectorBase;
+
+  constexpr decltype(auto) operator()(std::integral auto i) const
+  {
+    return this->operator[](i);
+  }
 };
 
 template <typename T>
@@ -142,9 +149,9 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& p)
     return os << "O";
   }
 
-  os << "[" << p[0];
+  os << "[" << p(0);
   for (int i = 1; i < p.size(); ++i) {
-    os << ", " << p[i];
+    os << ", " << p(i);
   }
   return os << "]";
 }

@@ -46,15 +46,10 @@ private:
   Stop m_stop;
 };
 
+template <auto... Args>
 auto shape(auto... args)
 {
-  return Box(vec(args...));
-}
-
-template <auto... Args>
-auto shape()
-{
-  return Box(vec<Args...>());
+  return Box(vec<Args...>(args...));
 }
 
 auto cube(auto radius)

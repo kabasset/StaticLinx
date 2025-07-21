@@ -16,21 +16,31 @@ public:
   using Start = Vector<TStart>;
   using Stop = Vector<TStop>;
 
-  Box(const Stop& stop) : m_start {}, m_stop(stop) {}
+  constexpr Box(const Stop& stop) : m_start {}, m_stop(stop) {}
 
-  Box(const Start& start, const Stop& stop) : m_start(start), m_stop(stop) {}
+  constexpr Box(const Start& start, const Stop& stop) : m_start(start), m_stop(stop) {}
 
-  auto rank() const
+  constexpr auto rank() const
   {
     return m_stop.size();
   }
 
-  auto start(std::integral auto i) const
+  constexpr auto start() const
+  {
+    return m_start;
+  }
+
+  constexpr auto stop() const
+  {
+    return m_stop;
+  }
+
+  constexpr auto start(std::integral auto i) const
   {
     return m_start[i];
   }
 
-  auto stop(std::integral auto i) const
+  constexpr auto stop(std::integral auto i) const
   {
     return m_stop[i];
   }
@@ -47,15 +57,27 @@ private:
 };
 
 template <auto... Args>
-auto shape(auto... args)
+constexpr auto shape(auto... args)
 {
   return Box(vec<Args...>(args...));
 }
 
-auto cube(auto radius)
+constexpr auto cube(auto radius)
 {
   // return Box(vec(-args...), vec((args + 1)...));
   return Box(radius); // FIXME -radius, radius + 1
+}
+
+template <typename TStart, typename TShape>
+constexpr auto box(Vector<TStart> start, Box<void, TShape> shape)
+{
+  return Box(start, shape.stop()); // FIXME start + shape.stop()
+}
+
+template <typename TShape, typename TStop>
+constexpr auto box(Box<void, TShape> shape, Vector<TStop> stop)
+{
+  return Box(shape.stop(), stop); // FIXME stop - shape.stop()
 }
 
 } // namespace Linx

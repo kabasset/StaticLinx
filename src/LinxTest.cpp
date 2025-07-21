@@ -26,6 +26,8 @@ int main()
   std::cout << " shape() " << Linx::shape(1, 2, 3) << std::endl;
   std::cout << " shape<> " << Linx::shape<1, 2, 3>() << std::endl;
   std::cout << "<3_D>(1) " << Linx::shape<3_D>(1) << std::endl;
+  std::cout << "  box(+) " << Linx::box(Linx::vec<3_D>(1), Linx::shape<1, 2, 3>()) << std::endl;
+  std::cout << "  box(-) " << Linx::box(Linx::shape(1, 2, 3), Linx::vec({2, 3, 4})) << std::endl;
 
   std::cout << std::endl;
 
